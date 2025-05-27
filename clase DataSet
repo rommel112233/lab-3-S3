@@ -1,1 +1,355 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
+public class Dataset{
+
+private ArrayList<Game>data;
+private String sortedByAttribute;
+
+public Dataset(ArrayList<Game>data){
+this.data=data;
+this.sortedByAttribute="";}
+
+public ArrayList<Game> getGamesByPrice(int price){
+
+ArrayList<Game> PrecioSolicitado = new ArrayList<>();
+
+if("price".equals(sortedByAttribute)){
+int indice = busquedabinariaPrecio(price);
+
+if(indice != -1){
+int izquierda = indice;
+while(izquierda >= 0 && data.get(izquierda).getPrice() == price){
+PrecioSolicitado.add(0,data.get(izquierda));
+izquierda--; }
+
+int derecha = indice + 1;
+while(derecha<data.size() && data.get(derecha).getPrice() == price){
+PrecioSolicitado.add(data.get(derecha));
+derecha++; }
+}
+}
+else{
+for(int i=0; i<data.size(); i++){
+if(data.get(i).getPrice() == price){
+PrecioSolicitado.add(data.get(i));}
+}
+}
+return PrecioSolicitado;
+}
+
+private int busquedabinariaPrecio(int price){
+int bajo=0, alto=data.size()-1;
+while(bajo<=alto){
+int mitad = (bajo+alto)/2;
+int dato = data.get(mitad).getPrice();
+if(dato==price){
+return mitad;
+}
+if(dato<price){
+bajo=mitad+1;
+}
+else{
+alto=mitad-1;
+}
+}
+return -1;
+}
+
+public ArrayList<Game> getGamesByPriceRange(int lowerPrice, int higherPrice){
+ArrayList<Game> juegoenrangoSolicitado = new ArrayList<>();
+
+if("price".equals(sortedByAttribute)){
+int indice = busquedabinariaRango(lowerPrice);
+
+while(indice<data.size()){
+int precioxposicion= data.get(indice).getPrice();
+if(precioxposicion>higherPrice){
+break;
+}
+juegoenrangoSolicitado.add(data.get(indice));
+indice++;
+}
+}else{
+for(int i=0; i<data.size(); i++){
+int precioxposicion = data.get(i).getPrice();
+if(precioxposicion>=lowerPrice && precioxposicion<=higherPrice){
+juegoenrangoSolicitado.add(data.get(i));
+}
+}
+}
+return juegoenrangoSolicitado;
+}
+
+private int busquedabinariaRango(int lowerPrice){
+int izquierda=0, derecha=data.size()-1, resultado=data.size();
+while(izquierda<=derecha){
+int mitad= (izquierda+derecha)/2;
+int precio=data.get(mitad).getPrice();
+if(precio>=lowerPrice){
+resultado=mitad;
+derecha=mitad-1;
+}else{
+izquierda=mitad+1;
+}
+}
+return resultado;
+}
+
+public ArrayList<Game> getGamesByCategory(String category){
+ArrayList<Game> categoriaSolicitada = new ArrayList<>();
+if("category".equals(sortedByAttribute)){
+int indice = busquedabinariaCategoria(category);
+if(indice!= -1){
+int izq = indice;
+while(izq>=0 && data.get(izq).getCategory().equals(category)){
+categoriaSolicitada.add(0,data.get(izq));
+izq--;
+}
+int derecha = indice + 1;
+while(derecha<data.size() && data.get(derecha).getCategory().equals(category)){
+categoriaSolicitada.add(data.get(derecha));
+derecha++;
+}
+}
+}else{ 
+for(int i=0; i<data.size();i++){ 
+if(data.get(i).getCategory().equals(category)){
+categoriaSolicitada.add(data.get(i));
+}
+}
+}
+return categoriaSolicitada;
+}
+
+private int busquedabinariaCategoria(String category){
+int izq=0, derecha=data.size()-1;
+while(izq<=derecha){
+int mitad=(izq+derecha)/2;
+String categoriaenlamitad = data.get(mitad).getCategory();
+int comparador = categoriaenlamitad.compareTo(category);
+if(comparador == 0){
+return mitad;
+}else if(comparador<0){
+izq= mitad+1;
+}else{
+derecha=mitad-1;
+}
+}
+return -1;
+}
+
+public ArrayList<Game> getGamesByQuality(int quality){
+
+ArrayList<Game> calidadsolicitada = new ArrayList<>();
+
+if("quality".equals(sortedByAttribute)){
+int indice = busquedabinariaCalidad(quality);
+
+if(indice != -1){
+int izquierda = indice;
+while(izquierda >= 0 && data.get(izquierda).getQuality() == quality){
+calidadsolicitada.add(0,data.get(izquierda));
+izquierda--; }
+
+int derecha = indice + 1;
+while(derecha<data.size() && data.get(derecha).getQuality() == quality){
+calidadsolicitada.add(data.get(derecha));
+derecha++; }
+}
+}
+else{
+for(int i=0; i<data.size(); i++){
+if(data.get(i).getQuality() == quality){
+calidadsolicitada.add(data.get(i));}
+}
+}
+return calidadsolicitada;
+}
+
+private int busquedabinariaCalidad(int quality){
+int bajo=0, alto=data.size()-1;
+while(bajo<=alto){
+int mitad = (bajo+alto)/2;
+int dato = data.get(mitad).getQuality();
+if(dato==quality){
+return mitad;
+}
+if(dato<quality){
+bajo=mitad+1;
+}
+else{
+alto=mitad-1;
+}
+}
+return -1;
+}
+
+public ArrayList<Game> sortByAlgorithm(String algorithm, String attribute){
+Comparator<Game> comparador;
+
+switch(attribute){
+case "price":
+comparador = Comparator.comparingInt(Game::getPrice);
+break;
+case "category":
+comparador = Comparator.comparing(Game::getCategory);
+break;
+case "quality":
+comparador = Comparator.comparingInt(Game::getQuality);
+break;
+default:
+comparador = Comparator.comparingInt(Game::getPrice);
+attribute = "price";
+break;
+}
+
+switch(algorithm){
+case "bubbleSort":
+bubbleSort(comparador);
+break;
+case "insertionSort":
+insertionSort(comparador);
+break;
+case "selectionSort":
+selectionSort(comparador);
+break;
+case "mergeSort":
+data = mergeSort(data, comparador);
+break;
+case "quickSort":
+quickSort(0, data.size() - 1, comparador);
+break;
+default:
+Collections.sort(data, comparador);
+break;
+}
+
+sortedByAttribute = attribute;
+return data;
+}
+
+private void countingSortByQuality(){
+int maxQuality = 100;
+int[] count = new int[maxQuality + 1];
+ArrayList<ArrayList<Game>> buckets = new ArrayList<>(maxQuality + 1);
+
+for (int i = 0; i <= maxQuality; i++){
+buckets.add(new ArrayList<>());
+}
+for (Game game : data){
+count[game.getQuality()]++;
+buckets.get(game.getQuality()).add(game);
+}
+ArrayList<Game> sorted = new ArrayList<>();
+for (int i = 0; i <= maxQuality; i++){
+sorted.addAll(buckets.get(i));
+}
+data = sorted;
+}
+
+private void bubbleSort(Comparator<Game> comp){
+for(int i=0; i<data.size()-1; i++){
+for(int j=0; j<data.size()-1-i; j++){
+if(comp.compare(data.get(j), data.get(j+1)) > 0){
+Game temp = data.get(j);
+data.set(j, data.get(j+1));
+data.set(j+1, temp);
+}
+}
+}
+}
+
+private void insertionSort(Comparator<Game> comp){
+for(int i=1; i<data.size(); i++){
+Game actual = data.get(i);
+int j = i-1;
+while(j >= 0 && comp.compare(data.get(j), actual) > 0){
+data.set(j+1, data.get(j));
+j--;
+}
+data.set(j+1, actual);
+}
+}
+
+private void selectionSort(Comparator<Game> comp){
+for(int i=0; i<data.size()-1; i++){
+int minIndex = i;
+for(int j=i+1; j<data.size(); j++){
+if(comp.compare(data.get(j), data.get(minIndex)) < 0){
+minIndex = j;
+}
+}
+Game temp = data.get(i);
+data.set(i, data.get(minIndex));
+data.set(minIndex, temp);
+}
+}
+
+private ArrayList<Game> mergeSort(ArrayList<Game> lista, Comparator<Game> comp){
+if(lista.size() <= 1){
+return lista;
+}
+
+int mitad = lista.size() / 2;
+ArrayList<Game> izquierda = mergeSort(new ArrayList<>(lista.subList(0, mitad)), comp);
+ArrayList<Game> derecha = mergeSort(new ArrayList<>(lista.subList(mitad, lista.size())), comp);
+
+return merge(izquierda, derecha, comp);
+}
+
+private ArrayList<Game> merge(ArrayList<Game> izquierda, ArrayList<Game> derecha, Comparator<Game> comp){
+ArrayList<Game> resultado = new ArrayList<>();
+int i = 0, j = 0;
+
+while(i < izquierda.size() && j < derecha.size()){
+if(comp.compare(izquierda.get(i), derecha.get(j)) <= 0){
+resultado.add(izquierda.get(i));
+i++;
+}else{
+resultado.add(derecha.get(j));
+j++;
+}
+}
+
+while(i < izquierda.size()){
+resultado.add(izquierda.get(i));
+i++;
+}
+while(j < derecha.size()){
+resultado.add(derecha.get(j));
+j++;
+}
+
+return resultado;
+}
+
+private void quickSort(int bajo, int alto, Comparator<Game> comp){
+if(bajo < alto){
+int indicePivote = particion(bajo, alto, comp);
+quickSort(bajo, indicePivote - 1, comp);
+quickSort(indicePivote + 1, alto, comp);
+}
+}
+
+private int particion(int bajo, int alto, Comparator<Game> comp){
+Game pivote = data.get(alto);
+int i = bajo - 1;
+
+for(int j = bajo; j < alto; j++){
+if(comp.compare(data.get(j), pivote) <= 0){
+i++;
+Game temp = data.get(i);
+data.set(i, data.get(j));
+data.set(j, temp);
+}
+}
+
+Game temp = data.get(i + 1);
+data.set(i + 1, data.get(alto));
+data.set(alto, temp);
+
+return i + 1;
+}
+}
