@@ -1,1 +1,37 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
 
+public class GenerateData {
+    private static final String[] names= {"Dragon","Empire", "Quest", "Galaxy", "Legends", "Warrior","Knight","Rogue","Space"};
+    private static final String[] Category={"Acción","Aventura","Estrategia","RPG","Deportes","Simulación","Puzzle","Party Game","Shooter"};
+    public static ArrayList<Game> generateGames(int n) {
+        ArrayList<Game> games = new ArrayList<>();
+        Random rand = new Random();
+
+        for (int i = 0; i < n; i++) {
+            String name = names[rand.nextInt(names.length)] + names[rand.nextInt(names.length)];
+            String category = Category[rand.nextInt(Category.length)];
+            int price = rand.nextInt(70001);
+            int quality = rand.nextInt(101);
+
+            games.add(new Game(name, category, price, quality));
+        }
+
+        return games;
+    }
+
+    public static void guardarEnArchivo(ArrayList<Game> juegos, String nombreArchivo) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
+
+            for (Game juego : juegos) {
+                writer.write(juego.getName() + "," + juego.getCategory() + "," + juego.getPrice() + "," + juego.getQuality() + "\n");
+            }
+            System.out.println("Datos guardados en " + nombreArchivo);
+        } catch (IOException e) {
+            System.err.println("Error al guardar el archivo: " + e.getMessage());
+        }
+    }
+}
